@@ -18,10 +18,9 @@ function setStructure(syll) {
 	return syll;
 }
 
-/* if the dictionary could return no results (eg user input requests 100 syllable word), 
-need a marker to indicate the loop is back to start. Edge case.*/
-function parseWord(line, target){
 
+function parseWord(line, target){
+	var endOfList = line-1;
 	var result = [];
 	do {
 		result = dictArray[line].match(/[A-Z]\d/g) || []; 
@@ -29,15 +28,28 @@ function parseWord(line, target){
 		if (result.length == target) {
 			return dictArray[line].match(/[A-Z'\-\.]+/)[0];
 		}
+		else if (line == endOfList) {
+			var smaller = Math.floor(Math.random()*target-2)+1;
+			var newLine =Math.floor(Math.random()*wordCount+1);
+			//console.log(smaller, target-smaller);
+			return parseWord(line, target-smaller) + " " +parseWord(newLine, smaller);
+		}
 		else if (line==wordCount-1) {line = 0;}
-		else {line++;}
+		else {line++;} 
 	}
 	while (result.length !== target) 
 
 }
 
 function generatePoem (syll){
+	for (var i = 0; i < syll.length; i++) {
+		if (syll[i] >100) {
+			console.log('Come now, be reasonable. '+syll[i] +' syllables?? How about a nice 5/7/5 haiku?');
+			syll=[[5],[7],[5]];
+		}
+	}
 	var syllArray = setStructure(syll);
+	//console.log(syllArray);
 	for (var i = 0; i < syllArray.length; i++) {
 		poem.push([""]);
 		for (var j=1; j<syllArray[i].length; j++){
